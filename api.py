@@ -22,6 +22,7 @@ class ApiResponse:
     map_client = googlemaps.Client(API_KEY)
     def __init__(self,category):
         self.category = category
+        self.excel = Excel()
 
     def scrape_data(self):
         nextPageToken = None
@@ -33,13 +34,10 @@ class ApiResponse:
             response = ApiResponse.map_client.places(query=self.category,page_token=nextPageToken)
 
             # Get the next Page token from the maps api
-            try:
-                nextPageToken = response['next_page_token']
-            except KeyError:
-                break
+            
 
             # iterate thorugh all the places in the page
-            excel = Excel()
+            
             for places in response['results']:
                 NOT_FOUND = 'Details Cannot Be Found From Google'
 
@@ -61,7 +59,11 @@ class ApiResponse:
                 except KeyError:
                     website =NOT_FOUND
                 
-                excel.append_excel(contact,name,website,address)
+                self.excel.append_excel(contact,name,website,address)
+            try:
+                nextPageToken = response['next_page_token']
+            except KeyError:
+                break
 
 
 
